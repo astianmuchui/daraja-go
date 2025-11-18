@@ -131,7 +131,7 @@ func (d *Daraja) Authorize() (bool, []error) {
 	err = json.Unmarshal(body, &resp)
 
 	if err != nil {
-		log.Println("Error Unmarshalling Body")
+		log.Println("Error Unmarshalling Body", err)
 		return false, errs
 	}
 

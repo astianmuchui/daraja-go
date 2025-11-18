@@ -9,9 +9,10 @@ import (
 	"net/http"
 	"bytes"
 	"io"
+
 )
 
-func post [T any] (url string, token string, body []byte, out T) (int, T,[]error) {
+func post [T any] (url string, token string, body []byte, out T) (int, T, []error) {
 
 	if reflect.TypeOf(out).Kind() != reflect.Struct {
 		return 0, out, []error{}

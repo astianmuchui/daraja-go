@@ -9,6 +9,8 @@ var (
 	CONSUMER_SECRET = ""
 	CONSUMER_KEY = ""
 	SHORTCODE = ""
+	PASSKEY = ""
+	ACCOUNT_TYPE = ""
 )
 
 const (
@@ -56,6 +58,7 @@ type B2BPaymentRequestPayload struct {
 	QueueTimeOutURL        string `json:"QueueTimeOutURL"`
 	ResultURL              string `json:"ResultURL"`
 }
+
 
 type B2BPaymentResponsePayload struct {
 	OriginatorConversationID string `json:"OriginatorConversationID"`

@@ -76,8 +76,7 @@ type RegisterURLRequestPayload struct {
 
 type RegisterURLResponsePayload struct {
 	OriginatorConversationID string `json:"OriginatorConversationID"`
-	OriginatorCoversationID  string `json:"OriginatorCoversationID"` // some responses use a misspelling
-	ResponseCode             string `json:"ResponseCode"`
+	OriginatorCoversationID  string `json:"OriginatorCoversationID"`
 	ResponseDescription      string `json:"ResponseDescription"`
 }
 

@@ -1,14 +1,15 @@
 package daraja
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
-	"reflect"
-	"time"
-	"net/http"
-	"bytes"
 	"io"
+	"log"
+	"net/http"
+	"reflect"
+	"strconv"
+	"time"
 
 )
 
@@ -132,11 +133,20 @@ func (d *Daraja) Authorize() (bool, []error) {
 
 	if err != nil {
 		log.Println("Error Unmarshalling Body", err)
+		errs = append(errs, err)
+		return false, errs
+	}
+
+	expiry, err := strconv.Atoi(resp.ExpiresIn)
+
+	if err != nil {
+		log.Println("Error Unmarshalling Body", err)
+		errs = append(errs, err)
 		return false, errs
 	}
 
 	d.AccessToken = resp.AccessToken
-	d.Expiry = resTime.Add(time.Duration(resp.ExpiresIn) * time.Second)
+	d.Expiry = resTime.Add(time.Duration(expiry) * time.Second)
 	d.Expiry = d.Expiry.UTC()
 
 	return true, []error{}

@@ -33,7 +33,7 @@ type Daraja struct {
 
 type DarajaAuthResponse struct {
 	AccessToken string `json:"access_token"`
-	ExpiresIn   uint   `json:"expires_in"`
+	ExpiresIn   string   `json:"expires_in"`
 }
 
 type C2BConfirmationRequestPayload struct {

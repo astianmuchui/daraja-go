@@ -44,7 +44,7 @@ func post [T any] (url string, token string, body []byte, out T) (int, T, []erro
 
 	var payload T
 
-	err = json.Unmarshal(res, payload)
+	err = json.Unmarshal(res, &payload)
 
 	if err != nil {
 		errs = append(errs, err)

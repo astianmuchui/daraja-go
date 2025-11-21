@@ -305,7 +305,7 @@ func (d *Daraja) RegisterURLs(r *RegisterURLRequestPayload) (*RegisterURLRespons
 		return &RegisterURLResponsePayload{}, 0, false, []error{err}
 	}
 
-	status, response, errs := post(AccountBalanceQuery_URL, d.AccessToken, payload, RegisterURLResponsePayload{})
+	status, response, errs := post(RegisterURL_URL, d.AccessToken, payload, RegisterURLResponsePayload{})
 
 	if len(errs) > 0 {
 		return &RegisterURLResponsePayload{}, status, false, errs

@@ -92,6 +92,7 @@ func get [T any] (url string, token string, out T) (int, T, []error) {
 	return resp.StatusCode, out, errs
 }
 
+
 func (d *Daraja) Authorize() (bool, []error) {
 	var errs []error
 	var status int
@@ -313,4 +314,26 @@ func (d *Daraja) RegisterURLs(r *RegisterURLRequestPayload) (*RegisterURLRespons
 
 
 	return &response, status, true, []error{}
+}
+
+
+func GetResultDesc(code string) string {
+	return ResultCodeDescriptions[code]
+}
+
+func (v *ValidateTransactionPayload) ToResponse(ResultCode string, accept bool) (*ValidationResponse) {
+	var r ValidationResponse
+	r.ResultCode = ResultCode
+
+	var status string
+
+	if accept {
+		status = "Accepted"
+	} else {
+		status = "Rejected"
+	}
+
+	r.ResultDesc = status
+
+	return &r
 }

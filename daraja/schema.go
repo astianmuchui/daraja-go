@@ -26,6 +26,25 @@ const (
 	B2CPaymentRequest_URL      = "https://sandbox.safaricom.co.ke/mpesa/b2c/v1/paymentrequest"
 )
 
+const (
+	ResultCodeInvalidMSISDN    = "C2B00011"
+	ResultCodeInvalidAccount   = "C2B00012"
+	ResultCodeInvalidAmount    = "C2B00013"
+	ResultCodeInvalidKYC       = "C2B00014"
+	ResultCodeInvalidShortcode = "C2B00015"
+	ResultCodeOtherError       = "C2B00016"
+)
+
+var ResultCodeDescriptions = map[string]string{
+	ResultCodeInvalidMSISDN:    "Invalid MSISDN",
+	ResultCodeInvalidAccount:   "Invalid Account Number",
+	ResultCodeInvalidAmount:    "Invalid Amount",
+	ResultCodeInvalidKYC:       "Invalid KYC Details",
+	ResultCodeInvalidShortcode: "Invalid Shortcode",
+	ResultCodeOtherError:       "Other Error",
+}
+
+
 type Daraja struct {
 	AccessToken string
 	Expiry      time.Time
@@ -188,3 +207,25 @@ type B2CPaymentResponsePayload struct {
 	ResponseDescription      string `json:"ResponseDescription"`
 }
 
+
+
+type ValidateTransactionPayload struct {
+	TransactionType   string `json:"TransactionType"`
+	TransID           string `json:"TransID"`
+	TransTime         string `json:"TransTime"`
+	TransAmount       string `json:"TransAmount"`
+	BusinessShortCode string `json:"BusinessShortCode"`
+	BillRefNumber     string `json:"BillRefNumber"`
+	InvoiceNumber     string `json:"InvoiceNumber,omitempty"`
+	OrgAccountBalance string `json:"OrgAccountBalance,omitempty"`
+	ThirdPartyTransID string `json:"ThirdPartyTransID,omitempty"`
+	MSISDN            string `json:"MSISDN"`
+	FirstName         string `json:"FirstName,omitempty"`
+	MiddleName        string `json:"MiddleName,omitempty"`
+	LastName          string `json:"LastName,omitempty"`
+}
+
+type ValidationResponse struct {
+	ResultCode string `json:"ResultCode"`
+	ResultDesc string `json:"ResultDesc"`
+}

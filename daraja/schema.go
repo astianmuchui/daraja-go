@@ -22,21 +22,34 @@ const (
 )
 
 
+var prod bool
+
 var (
-	ENVIRONMENT int // 0 for sandbox, 1 for production
-	CONSUMER_SECRET = ""
-	CONSUMER_KEY    = ""
-	SHORTCODE       = ""
-	PASSKEY         = ""
-	ACCOUNT_TYPE    = ""
+	AUTH_URL                   string
+	C2BConfirmation_URL        string
+	RegisterURL_URL            string
+	AccountBalanceQuery_URL    string
+	STK_PUSH_URL               string
+	REVERSAL_URL               string
+	B2B_URL                    string
+	TransactionStatusQuery_URL string
+	OnlineTransactionQuery_URL string
+	B2CPaymentRequest_URL      string
 )
 
-func init() {
+func Production(state bool) {
+	prod = state
+	initializeURLs()
+}
+
+func SetProductionMode() {
+	Production(true)
+}
+
+func initializeURLs() {
 	var url_prefix string
-	if ENVIRONMENT == 0 {
+	if !prod {
 		url_prefix = "https://sandbox.safaricom.co.ke"
-	} else if ENVIRONMENT == 1 {
-		url_prefix = "https://api.safaricom.co.ke"
 	} else {
 		url_prefix = "https://api.safaricom.co.ke"
 	}
@@ -53,17 +66,17 @@ func init() {
 	B2CPaymentRequest_URL = url_prefix + "/mpesa/b2c/v1/paymentrequest"
 }
 
+func init() {
+	prod = false
+	initializeURLs()
+}
+
 var (
-	AUTH_URL                   string
-	C2BConfirmation_URL        string
-	RegisterURL_URL            string
-	AccountBalanceQuery_URL    string
-	STK_PUSH_URL               string
-	REVERSAL_URL               string
-	B2B_URL                    string
-	TransactionStatusQuery_URL string
-	OnlineTransactionQuery_URL string
-	B2CPaymentRequest_URL      string
+	CONSUMER_SECRET = ""
+	CONSUMER_KEY    = ""
+	SHORTCODE       = ""
+	PASSKEY         = ""
+	ACCOUNT_TYPE    = ""
 )
 
 var ResultCodeDescriptions = map[string]string{

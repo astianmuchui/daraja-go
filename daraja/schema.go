@@ -18,7 +18,7 @@ const (
 
 
 var (
-	ENVIRONMENT     = 0 // 0 for sandbox, 1 for production
+	ENVIRONMENT int // 0 for sandbox, 1 for production
 	CONSUMER_SECRET = ""
 	CONSUMER_KEY    = ""
 	SHORTCODE       = ""
@@ -31,6 +31,8 @@ func init() {
 	if ENVIRONMENT == 0 {
 		url_prefix = "https://sandbox.safaricom.co.ke"
 	} else if ENVIRONMENT == 1 {
+		url_prefix = "https://api.safaricom.co.ke"
+	} else {
 		url_prefix = "https://api.safaricom.co.ke"
 	}
 

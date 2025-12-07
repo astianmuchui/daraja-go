@@ -5,25 +5,25 @@ import (
 
 )
 
-var (
-	CONSUMER_SECRET = ""
-	CONSUMER_KEY = ""
-	SHORTCODE = ""
-	PASSKEY = ""
-	ACCOUNT_TYPE = ""
-)
 
-const (
-	AUTH_URL                   = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"
-	C2BConfirmation_URL        = "https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl"
-	RegisterURL_URL            = "https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl"
-	AccountBalanceQuery_URL    = "https://sandbox.safaricom.co.ke/mpesa/accountbalance/v1/query"
-	STK_PUSH_URL               = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
-	REVERSAL_URL               = "https://sandbox.safaricom.co.ke/mpesa/reversal/v1/request"
-	B2B_URL                    = "https://sandbox.safaricom.co.ke/mpesa/b2b/v1/paymentrequest"
-	TransactionStatusQuery_URL = "https://sandbox.safaricom.co.ke/mpesa/transactionstatus/v1/query"
-	OnlineTransactionQuery_URL = "https://sandbox.safaricom.co.ke/mpesa/stkpushquery/v1/query"
-	B2CPaymentRequest_URL      = "https://sandbox.safaricom.co.ke/mpesa/b2c/v1/paymentrequest"
+var (
+	AUTH_URL                   = url_prefix + "/oauth/v1/generate?grant_type=client_credentials"
+	C2BConfirmation_URL        = url_prefix + "/mpesa/c2b/v1/registerurl"
+	RegisterURL_URL            = url_prefix + "/mpesa/c2b/v1/registerurl"
+	AccountBalanceQuery_URL    = url_prefix + "/mpesa/accountbalance/v1/query"
+	STK_PUSH_URL               = url_prefix + "/mpesa/stkpush/v1/processrequest"
+	REVERSAL_URL               = url_prefix + "/mpesa/reversal/v1/request"
+	B2B_URL                    = url_prefix + "/mpesa/b2b/v1/paymentrequest"
+	TransactionStatusQuery_URL = url_prefix + "/mpesa/transactionstatus/v1/query"
+	OnlineTransactionQuery_URL = url_prefix + "/mpesa/stkpushquery/v1/query"
+	B2CPaymentRequest_URL      = url_prefix + "/mpesa/b2c/v1/paymentrequest"
+
+	CONSUMER_SECRET = ""
+	CONSUMER_KEY    = ""
+	SHORTCODE       = ""
+	PASSKEY         = ""
+	ACCOUNT_TYPE    = ""
+	ENVIRONMENT     = 0 // 0 for sandbox, 1 for production
 )
 
 const (
@@ -35,6 +35,17 @@ const (
 	ResultCodeOtherError       = "C2B00016"
 )
 
+var url_prefix string
+
+func init() {
+	if ENVIRONMENT == 0 {
+		url_prefix = "https://sandbox.safaricom.co.ke"
+	} else if ENVIRONMENT == 1 {
+		url_prefix = "https://api.safaricom.co.ke"
+	}
+}
+
+
 var ResultCodeDescriptions = map[string]string{
 	ResultCodeInvalidMSISDN:    "Invalid MSISDN",
 	ResultCodeInvalidAccount:   "Invalid Account Number",
@@ -44,7 +55,6 @@ var ResultCodeDescriptions = map[string]string{
 	ResultCodeOtherError:       "Other Error",
 }
 
-
 type Daraja struct {
 	AccessToken string
 	Expiry      time.Time
@@ -52,7 +62,7 @@ type Daraja struct {
 
 type DarajaAuthResponse struct {
 	AccessToken string `json:"access_token"`
-	ExpiresIn   string   `json:"expires_in"`
+	ExpiresIn   string `json:"expires_in"`
 }
 
 type C2BConfirmationRequestPayload struct {
@@ -77,7 +87,6 @@ type B2BPaymentRequestPayload struct {
 	QueueTimeOutURL        string `json:"QueueTimeOutURL"`
 	ResultURL              string `json:"ResultURL"`
 }
-
 
 type B2BPaymentResponsePayload struct {
 	OriginatorConversationID string `json:"OriginatorConversationID"`
@@ -206,8 +215,6 @@ type B2CPaymentResponsePayload struct {
 	ResponseCode             string `json:"ResponseCode"`
 	ResponseDescription      string `json:"ResponseDescription"`
 }
-
-
 
 type ValidateTransactionPayload struct {
 	TransactionType   string `json:"TransactionType"`

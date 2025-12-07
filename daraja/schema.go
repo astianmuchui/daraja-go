@@ -5,6 +5,29 @@ import (
 
 )
 
+var url_prefix string
+
+var ENVIRONMENT  = 0 // 0 for sandbox, 1 for production
+
+
+const (
+	ResultCodeInvalidMSISDN    = "C2B00011"
+	ResultCodeInvalidAccount   = "C2B00012"
+	ResultCodeInvalidAmount    = "C2B00013"
+	ResultCodeInvalidKYC       = "C2B00014"
+	ResultCodeInvalidShortcode = "C2B00015"
+	ResultCodeOtherError       = "C2B00016"
+)
+
+
+
+func init() {
+	if ENVIRONMENT == 0 {
+		url_prefix = "https://sandbox.safaricom.co.ke"
+	} else if ENVIRONMENT == 1 {
+		url_prefix = "https://api.safaricom.co.ke"
+	}
+}
 
 var (
 	AUTH_URL                   = url_prefix + "/oauth/v1/generate?grant_type=client_credentials"
@@ -23,28 +46,7 @@ var (
 	SHORTCODE       = ""
 	PASSKEY         = ""
 	ACCOUNT_TYPE    = ""
-	ENVIRONMENT     = 0 // 0 for sandbox, 1 for production
 )
-
-const (
-	ResultCodeInvalidMSISDN    = "C2B00011"
-	ResultCodeInvalidAccount   = "C2B00012"
-	ResultCodeInvalidAmount    = "C2B00013"
-	ResultCodeInvalidKYC       = "C2B00014"
-	ResultCodeInvalidShortcode = "C2B00015"
-	ResultCodeOtherError       = "C2B00016"
-)
-
-var url_prefix string
-
-func init() {
-	if ENVIRONMENT == 0 {
-		url_prefix = "https://sandbox.safaricom.co.ke"
-	} else if ENVIRONMENT == 1 {
-		url_prefix = "https://api.safaricom.co.ke"
-	}
-}
-
 
 var ResultCodeDescriptions = map[string]string{
 	ResultCodeInvalidMSISDN:    "Invalid MSISDN",

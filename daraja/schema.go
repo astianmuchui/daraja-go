@@ -5,9 +5,6 @@ import (
 
 )
 
-var url_prefix string
-
-var ENVIRONMENT  = 0 // 0 for sandbox, 1 for production
 
 
 const (
@@ -20,32 +17,46 @@ const (
 )
 
 
-
-func init() {
-	if ENVIRONMENT == 0 {
-		url_prefix = "https://sandbox.safaricom.co.ke"
-	} else if ENVIRONMENT == 1 {
-		url_prefix = "https://api.safaricom.co.ke"
-	}
-}
-
 var (
-	AUTH_URL                   = url_prefix + "/oauth/v1/generate?grant_type=client_credentials"
-	C2BConfirmation_URL        = url_prefix + "/mpesa/c2b/v1/registerurl"
-	RegisterURL_URL            = url_prefix + "/mpesa/c2b/v1/registerurl"
-	AccountBalanceQuery_URL    = url_prefix + "/mpesa/accountbalance/v1/query"
-	STK_PUSH_URL               = url_prefix + "/mpesa/stkpush/v1/processrequest"
-	REVERSAL_URL               = url_prefix + "/mpesa/reversal/v1/request"
-	B2B_URL                    = url_prefix + "/mpesa/b2b/v1/paymentrequest"
-	TransactionStatusQuery_URL = url_prefix + "/mpesa/transactionstatus/v1/query"
-	OnlineTransactionQuery_URL = url_prefix + "/mpesa/stkpushquery/v1/query"
-	B2CPaymentRequest_URL      = url_prefix + "/mpesa/b2c/v1/paymentrequest"
-
+	ENVIRONMENT     = 0 // 0 for sandbox, 1 for production
 	CONSUMER_SECRET = ""
 	CONSUMER_KEY    = ""
 	SHORTCODE       = ""
 	PASSKEY         = ""
 	ACCOUNT_TYPE    = ""
+)
+
+func init() {
+	var url_prefix string
+	if ENVIRONMENT == 0 {
+		url_prefix = "https://sandbox.safaricom.co.ke"
+	} else if ENVIRONMENT == 1 {
+		url_prefix = "https://api.safaricom.co.ke"
+	}
+
+	AUTH_URL = url_prefix + "/oauth/v1/generate?grant_type=client_credentials"
+	C2BConfirmation_URL = url_prefix + "/mpesa/c2b/v1/registerurl"
+	RegisterURL_URL = url_prefix + "/mpesa/c2b/v1/registerurl"
+	AccountBalanceQuery_URL = url_prefix + "/mpesa/accountbalance/v1/query"
+	STK_PUSH_URL = url_prefix + "/mpesa/stkpush/v1/processrequest"
+	REVERSAL_URL = url_prefix + "/mpesa/reversal/v1/request"
+	B2B_URL = url_prefix + "/mpesa/b2b/v1/paymentrequest"
+	TransactionStatusQuery_URL = url_prefix + "/mpesa/transactionstatus/v1/query"
+	OnlineTransactionQuery_URL = url_prefix + "/mpesa/stkpushquery/v1/query"
+	B2CPaymentRequest_URL = url_prefix + "/mpesa/b2c/v1/paymentrequest"
+}
+
+var (
+	AUTH_URL                   string
+	C2BConfirmation_URL        string
+	RegisterURL_URL            string
+	AccountBalanceQuery_URL    string
+	STK_PUSH_URL               string
+	REVERSAL_URL               string
+	B2B_URL                    string
+	TransactionStatusQuery_URL string
+	OnlineTransactionQuery_URL string
+	B2CPaymentRequest_URL      string
 )
 
 var ResultCodeDescriptions = map[string]string{

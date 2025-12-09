@@ -10,10 +10,9 @@ import (
 	"reflect"
 	"strconv"
 	"time"
-
 )
 
-func post [T any] (url string, token string, body []byte, out T) (int, T, []error) {
+func post[T any](url string, token string, body []byte, out T) (int, T, []error) {
 
 	if reflect.TypeOf(out).Kind() != reflect.Struct {
 		return 0, out, []error{}
@@ -53,7 +52,7 @@ func post [T any] (url string, token string, body []byte, out T) (int, T, []erro
 	return status, payload, errs
 }
 
-func get [T any] (url string, token string, out T) (int, T, []error) {
+func get[T any](url string, token string, out T) (int, T, []error) {
 	if reflect.TypeOf(out).Kind() != reflect.Struct {
 		return 0, out, []error{}
 	}
@@ -82,7 +81,6 @@ func get [T any] (url string, token string, out T) (int, T, []error) {
 		return resp.StatusCode, out, []error{err}
 	}
 
-
 	err = json.Unmarshal(body, out)
 
 	if err != nil {
@@ -91,7 +89,6 @@ func get [T any] (url string, token string, out T) (int, T, []error) {
 
 	return resp.StatusCode, out, errs
 }
-
 
 func (d *Daraja) Authorize() (bool, []error) {
 	var errs []error
@@ -159,7 +156,7 @@ func (d *Daraja) Authorize() (bool, []error) {
 */
 
 func (d *Daraja) IsAuthorized() bool {
-	return time.Now().UTC().After(d.Expiry)
+	return time.Now().After(d.Expiry)
 }
 
 func (d *Daraja) RetryAuth(status chan bool, errs chan []error) {
@@ -207,7 +204,6 @@ func (d *Daraja) ReverseTransaction(r *ReversalRequestPayload) (*QueryTransactio
 		return &QueryTransactionStatusResponsePayload{}, status, false, errs
 	}
 
-
 	return &response, status, true, []error{}
 }
 
@@ -227,7 +223,6 @@ func (d *Daraja) QueryTransactionStatus(r *QueryTransactionStatusRequestPayload)
 	if len(errs) > 0 {
 		return &QueryTransactionStatusResponsePayload{}, status, false, errs
 	}
-
 
 	return &response, status, true, []error{}
 }
@@ -249,11 +244,10 @@ func (d *Daraja) B2CPaymentRequest(r *B2CPaymentRequestPayload) (*B2CPaymentResp
 		return &B2CPaymentResponsePayload{}, status, false, errs
 	}
 
-
 	return &response, status, true, []error{}
 }
 
-func (d *Daraja) LipaNaMpesaOnlinePayment(r *LipaNaMpesaOnlineRequestPayload)  (*LipaNaMpesaOnlinePaymentResponsePayload, int, bool, []error) {
+func (d *Daraja) LipaNaMpesaOnlinePayment(r *LipaNaMpesaOnlineRequestPayload) (*LipaNaMpesaOnlinePaymentResponsePayload, int, bool, []error) {
 	if !d.IsAuthorized() {
 		d.Authorize()
 	}
@@ -269,7 +263,6 @@ func (d *Daraja) LipaNaMpesaOnlinePayment(r *LipaNaMpesaOnlineRequestPayload)  (
 	if len(errs) > 0 {
 		return &LipaNaMpesaOnlinePaymentResponsePayload{}, status, false, errs
 	}
-
 
 	return &response, status, true, []error{}
 }
@@ -291,7 +284,6 @@ func (d *Daraja) QueryAccountBalance(r *AccountBalanceQueryRequestPayload) (*Acc
 		return &AccountBalanceQueryResponsePayload{}, status, false, errs
 	}
 
-
 	return &response, status, true, []error{}
 }
 
@@ -312,16 +304,14 @@ func (d *Daraja) RegisterURLs(r *RegisterURLRequestPayload) (*RegisterURLRespons
 		return &RegisterURLResponsePayload{}, status, false, errs
 	}
 
-
 	return &response, status, true, []error{}
 }
-
 
 func GetResultDesc(code string) string {
 	return ResultCodeDescriptions[code]
 }
 
-func (v *ValidateTransactionPayload) ToResponse(ResultCode string, accept bool) (*ValidationResponse) {
+func (v *ValidateTransactionPayload) ToResponse(ResultCode string, accept bool) *ValidationResponse {
 	var r ValidationResponse
 	r.ResultCode = ResultCode
 

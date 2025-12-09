@@ -156,7 +156,7 @@ func (d *Daraja) Authorize() (bool, []error) {
 */
 
 func (d *Daraja) IsAuthorized() bool {
-	return time.Now().After(d.Expiry)
+	return time.Now().UTC().After(d.Expiry.UTC())
 }
 
 func (d *Daraja) RetryAuth(status chan bool, errs chan []error) {

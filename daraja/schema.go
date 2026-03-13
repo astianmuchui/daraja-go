@@ -1,5 +1,5 @@
-
-/**
+/*
+*
 Daraja Go
 By Sebastian Muchui :)
 */
@@ -7,10 +7,7 @@ package daraja
 
 import (
 	"time"
-
 )
-
-
 
 const (
 	ResultCodeInvalidMSISDN    = "C2B00011"
@@ -21,20 +18,21 @@ const (
 	ResultCodeOtherError       = "C2B00016"
 )
 
-
 var prod bool
 
 var (
-	AUTH_URL                   string
-	C2BConfirmation_URL        string
-	RegisterURL_URL            string
-	AccountBalanceQuery_URL    string
-	STK_PUSH_URL               string
-	REVERSAL_URL               string
-	B2B_URL                    string
-	TransactionStatusQuery_URL string
-	OnlineTransactionQuery_URL string
-	B2CPaymentRequest_URL      string
+	AUTH_URL                       string
+	C2BConfirmation_URL            string
+	RegisterURL_URL                string
+	AccountBalanceQuery_URL        string
+	STK_PUSH_URL                   string
+	REVERSAL_URL                   string
+	B2B_URL                        string
+	TransactionStatusQuery_URL     string
+	OnlineTransactionQuery_URL     string
+	B2CPaymentRequest_URL          string
+	TransactionHistoryQuery_URL    string
+	TransactionHistoryRegister_URL string
 )
 
 func Production(state bool) {
@@ -56,14 +54,21 @@ func initializeURLs() {
 
 	AUTH_URL = url_prefix + "/oauth/v1/generate?grant_type=client_credentials"
 	C2BConfirmation_URL = url_prefix + "/mpesa/c2b/v1/registerurl"
+
 	RegisterURL_URL = url_prefix + "/mpesa/c2b/v1/registerurl"
 	AccountBalanceQuery_URL = url_prefix + "/mpesa/accountbalance/v1/query"
+
 	STK_PUSH_URL = url_prefix + "/mpesa/stkpush/v1/processrequest"
 	REVERSAL_URL = url_prefix + "/mpesa/reversal/v1/request"
+
 	B2B_URL = url_prefix + "/mpesa/b2b/v1/paymentrequest"
 	TransactionStatusQuery_URL = url_prefix + "/mpesa/transactionstatus/v1/query"
+
 	OnlineTransactionQuery_URL = url_prefix + "/mpesa/stkpushquery/v1/query"
 	B2CPaymentRequest_URL = url_prefix + "/mpesa/b2c/v1/paymentrequest"
+
+	TransactionHistoryRegister_URL = url_prefix + "/pulltransactions/v1/register"
+	TransactionHistoryQuery_URL = url_prefix + "/pulltransactions/v1/query"
 }
 
 func init() {
@@ -268,4 +273,35 @@ type ValidateTransactionPayload struct {
 type ValidationResponse struct {
 	ResultCode string `json:"ResultCode"`
 	ResultDesc string `json:"ResultDesc"`
+}
+
+type RegisterPullTransactionsRequestPayload struct {
+	ShortCode       string `json:"ShortCode"`
+	RequestType     string `json:"RequestType"`
+	NominatedNumber string `json:"NominatedNumber"`
+	CallBackURL     string `json:"CallBackURL"`
+}
+
+type RegisterPullTransactionsResponsePayload struct {
+	ResponseRefID       string `json:"ResponseRefID"`
+	ResponseStatus      string `json:"ResponseStatus"`
+	ShortCode           string `json:"ShortCode"`
+	ResponseDescription string `json:"ResponseDescription"`
+}
+
+type QueryPullTransactionsRequestPayload struct {
+	ShortCode   string `json:"ShortCode"`
+	StartDate   string `json:"StartDate"`
+	EndDate     string `json:"EndDate"`
+	OffSetValue string `json:"OffSetValue"`
+}
+
+type QueryPullTransactionsResponsePayload struct {
+	ResponseStatus      string `json:"ResponseStatus"`
+	ResponseDescription string `json:"ResponseDescription"`
+	ResponseRefID       string `json:"ResponseRefID"`
+	ShortCode           string `json:"ShortCode"`
+	StartDate           string `json:"StartDate"`
+	EndDate             string `json:"EndDate"`
+	OffSetValue         string `json:"OffSetValue"`
 }

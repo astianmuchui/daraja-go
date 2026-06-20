@@ -103,12 +103,27 @@ type DarajaAuthResponse struct {
 	ExpiresIn   string `json:"expires_in"`
 }
 
+// C2BConfirmationRequestPayload is the body M-Pesa POSTs to the registered
+// C2B ConfirmationURL when a paybill/till payment completes. It mirrors the
+// validation payload: TransAmount/TransID/MSISDN — NOT Amount/Msisdn, which
+// only appear in the C2B "simulate" request body.
+//
+// Note: for some shortcodes M-Pesa tokenizes (hashes) the MSISDN, so it may
+// not be a dialable number.
 type C2BConfirmationRequestPayload struct {
-	ShortCode     string `json:"ShortCode"`
-	CommandID     string `json:"CommandID"`
-	Amount        string `json:"Amount"`
-	Msidsn        string `json:"Msisdn"`
-	BillRefNumber string `json:"BillRefNumber"`
+	TransactionType   string `json:"TransactionType"`
+	TransID           string `json:"TransID"`
+	TransTime         string `json:"TransTime"`
+	TransAmount       string `json:"TransAmount"`
+	BusinessShortCode string `json:"BusinessShortCode"`
+	BillRefNumber     string `json:"BillRefNumber"`
+	InvoiceNumber     string `json:"InvoiceNumber,omitempty"`
+	OrgAccountBalance string `json:"OrgAccountBalance,omitempty"`
+	ThirdPartyTransID string `json:"ThirdPartyTransID,omitempty"`
+	MSISDN            string `json:"MSISDN"`
+	FirstName         string `json:"FirstName,omitempty"`
+	MiddleName        string `json:"MiddleName,omitempty"`
+	LastName          string `json:"LastName,omitempty"`
 }
 
 type B2BPaymentRequestPayload struct {

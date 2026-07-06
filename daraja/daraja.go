@@ -27,7 +27,7 @@ func post[T any](url string, token string, body []byte, out T) (int, T, []error)
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 	req.Header.Set("Content-Type", "application/json")
 
-	client := &http.Client{Timeout: 60 * time.Second}
+	client := &http.Client{Timeout: 30 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
 		return 0, out, []error{err}
@@ -101,7 +101,7 @@ func (d *Daraja) Authorize() (bool, []error) {
 	if err != nil {
 		errs = append(errs, err)
 	} else {
-		client := &http.Client{Timeout: 60 * time.Second}
+		client := &http.Client{Timeout: 30 * time.Second}
 		resp, err := client.Do(req)
 		if err != nil {
 			errs = append(errs, err)

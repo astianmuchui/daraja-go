@@ -20,19 +20,37 @@ const (
 
 var prod bool
 
+const (
+	DARAJA_PRODUCTION_URL = "https://api.safaricom.co.ke"
+	DARAJA_SANDBOX_URL    = "https://sandbox.safaricom.co.ke"
+)
+
 var (
-	AUTH_URL                       string
-	C2BConfirmation_URL            string
-	RegisterURL_URL                string
-	AccountBalanceQuery_URL        string
-	STK_PUSH_URL                   string
-	REVERSAL_URL                   string
-	B2B_URL                        string
-	TransactionStatusQuery_URL     string
-	OnlineTransactionQuery_URL     string
-	B2CPaymentRequest_URL          string
-	TransactionHistoryQuery_URL    string
-	TransactionHistoryRegister_URL string
+	AUTH_URL                                 string
+	C2BConfirmation_URL                      string
+	RegisterURL_URL                          string
+	AccountBalanceQuery_URL                  string
+	STK_PUSH_URL                             string
+	REVERSAL_URL                             string
+	B2B_URL                                  string
+	TransactionStatusQuery_URL               string
+	OnlineTransactionQuery_URL               string
+	B2CPaymentRequest_URL                    string
+	TransactionHistoryQuery_URL              string
+	TransactionHistoryRegister_URL           string
+	TaxRemittanceRequest_URL                 string
+	BusinessPaybillTransaction_URL           string
+	BusinessBuyGoodsTransaction_URL          string
+	BillManagerGenericOptIn_URL              string
+	BillManagerSingleInvoicingGeneric_URL    string
+	BillManagerBulkInvoicingGeneric_URL      string
+	BillManagerPaymentsAndReconciliation_URL string
+	BillManagerCancelSingleInvoice_URL       string
+	BillManagerCancelBulkInvoices_URL        string
+	BillManagerUpdateOptinDetailsRequest_URL string
+
+	B2BExpressCheckout_URL string
+	BusinessToPochi_URL    string
 )
 
 func Production(state bool) {
@@ -69,6 +87,25 @@ func initializeURLs() {
 
 	TransactionHistoryRegister_URL = url_prefix + "/pulltransactions/v1/register"
 	TransactionHistoryQuery_URL = url_prefix + "/pulltransactions/v1/query"
+
+	TaxRemittanceRequest_URL = url_prefix + "/mpesa/b2b/v1/remittax"
+
+	BusinessPaybillTransaction_URL = url_prefix + "/mpesa/b2b/v1/paymentrequest"
+	BusinessBuyGoodsTransaction_URL = BusinessPaybillTransaction_URL
+
+	BillManagerGenericOptIn_URL = url_prefix + "v1/billmanager-invoice/optin"
+	BillManagerSingleInvoicingGeneric_URL = url_prefix + "v1/billmanager-invoice/single-invoicing"
+
+	BillManagerBulkInvoicingGeneric_URL = url_prefix + "v1/billmanager-invoice/bulk-invoicing"
+	BillManagerPaymentsAndReconciliation_URL = url_prefix + "v1/billmanager-invoice/reconciliation"
+
+	BillManagerCancelSingleInvoice_URL = url_prefix + "/v1/billmanager-invoice/cancel-single-invoice"
+	BillManagerCancelBulkInvoices_URL = url_prefix + "/v1/billmanager-invoice/cancel-bulk-invoices"
+
+	BillManagerUpdateOptinDetailsRequest_URL = url_prefix + "/v1/billmanager-invoice/change-optin-details "
+
+	B2BExpressCheckout_URL = url_prefix + "/v1/ussdpush/get-msisdn"
+	BusinessToPochi_URL = url_prefix + "/mpesa/b2pochi/v1/paymentrequest"
 }
 
 func init() {
@@ -103,13 +140,6 @@ type DarajaAuthResponse struct {
 	ExpiresIn   string `json:"expires_in"`
 }
 
-// C2BConfirmationRequestPayload is the body M-Pesa POSTs to the registered
-// C2B ConfirmationURL when a paybill/till payment completes. It mirrors the
-// validation payload: TransAmount/TransID/MSISDN — NOT Amount/Msisdn, which
-// only appear in the C2B "simulate" request body.
-//
-// Note: for some shortcodes M-Pesa tokenizes (hashes) the MSISDN, so it may
-// not be a dialable number.
 type C2BConfirmationRequestPayload struct {
 	TransactionType   string `json:"TransactionType"`
 	TransID           string `json:"TransID"`
@@ -129,7 +159,7 @@ type C2BConfirmationRequestPayload struct {
 type B2BPaymentRequestPayload struct {
 	Initiator              string `json:"Initiator"`
 	SecurityCredential     string `json:"SecurityCredential"`
-	CommandID              string `json:"CommandID"`
+	CommandID              string `json:"Command ID"`
 	SenderIdentifierType   string `json:"SenderIdentifierType"`
 	RecieverIdentifierType string `json:"RecieverIdentifierType"`
 	Amount                 string `json:"Amount"`
@@ -319,4 +349,318 @@ type QueryPullTransactionsResponsePayload struct {
 	StartDate           string `json:"StartDate"`
 	EndDate             string `json:"EndDate"`
 	OffSetValue         string `json:"OffSetValue"`
+}
+
+type RemitKRARequestPayload struct {
+	Initiator              string `json:"Initiator"`
+	SecurityCredential     string `json:"SecurityCredential"`
+	CommandID              string `json:"Command ID"`
+	SenderIdentifierType   string `json:"SenderIdentifierType"`
+	ReceiverIdentifierType string `json:"RecieverIdentifierType"`
+	Amount                 string `json:"Amount"`
+	PartyA                 string `json:"PartyA"`
+	PartyB                 string `json:"PartyB"`
+	AccountReference       string `json:"AccountReference"`
+	Remarks                string `json:"Remarks"`
+	QueueTimeOutURL        string `json:"QueueTimeOutURL"`
+	ResultURL              string `json:"ResultURL"`
+}
+
+type RemitKRAResponsePayload struct {
+	OriginatorConversationID string `json:"OriginatorConversationID"`
+	ConversationID           string `json:"ConversationID"`
+	ResponseCode             string `json:"ResponseCode"`
+	ResponseDescription      string `json:"ResponseDescription"`
+}
+
+type RemitTaxResultPayload struct {
+	Result struct {
+		ResultType               string `json:"ResultType"`
+		ResultCode               string `json:"ResultCode"`
+		ResultDesc               string `json:"ResultDesc"`
+		OriginatorConversationID string `json:"OriginatorConversationID"`
+		ConversationID           string `json:"ConversationID"`
+		TransactionID            string `json:"TransactionID"`
+		ResultParameters         struct {
+			ResultParameter []struct {
+				Key   string `json:"Key"`
+				Value string `json:"Value"`
+			} `json:"ResultParameter"`
+		} `json:"ResultParameters"`
+		ReferenceData struct {
+			ReferenceItem []struct {
+				Key   string `json:"Key"`
+				Value string `json:"Value"`
+			} `json:"ReferenceItem"`
+		} `json:"ReferenceData"`
+	} `json:"Result"`
+}
+
+type RemitTaxFailedResultPayload struct {
+	Result struct {
+		ResultType               string `json:"ResultType"`
+		ResultCode               int    `json:"ResultCode"`
+		ResultDesc               string `json:"ResultDesc"`
+		OriginatorConversationID string `json:"OriginatorConversationID"`
+		ConversationID           string `json:"ConversationID"`
+		TransactionID            string `json:"TransactionID"`
+		ResultParameters         struct {
+			ResultParameter []struct {
+				Key   string `json:"Key"`
+				Value string `json:"Value"`
+			} `json:"ResultParameter"`
+		} `json:"ResultParameters"`
+		ReferenceData struct {
+			ReferenceItem struct {
+				Key   string `json:"Key"`
+				Value string `json:"Value"`
+			} `json:"ReferenceItem"`
+		} `json:"ReferenceData"`
+	} `json:"Result"`
+}
+
+type BusinessToPaybillTransactionRequestPayload struct {
+	Initiator              string `json:"Initiator"`
+	SecurityCredential     string `json:"SecurityCredential"`
+	CommandID              string `json:"Command ID"`
+	SenderIdentifierType   string `json:"SenderIdentifierType"`
+	RecieverIdentifierType string `json:"RecieverIdentifierType"`
+	Amount                 string `json:"Amount"`
+	PartyA                 string `json:"PartyA"`
+	PartyB                 string `json:"PartyB"`
+	AccountReference       string `json:"AccountReference"`
+	Requester              string `json:"Requester"`
+	Remarks                string `json:"Remarks"`
+	QueueTimeOutURL        string `json:"QueueTimeOutURL"`
+	ResultURL              string `json:"ResultURL"`
+}
+
+type BusinessToBuyGoodsTransactionRequestPayload struct {
+	Initiator              string `json:"Initiator"`
+	SecurityCredential     string `json:"SecurityCredential"`
+	CommandID              string `json:"Command ID"`
+	SenderIdentifierType   string `json:"SenderIdentifierType"`
+	RecieverIdentifierType string `json:"RecieverIdentifierType"`
+	Amount                 string `json:"Amount"`
+	PartyA                 string `json:"PartyA"`
+	PartyB                 string `json:"PartyB"`
+	AccountReference       string `json:"AccountReference"`
+	Requester              string `json:"Requester"`
+	Remarks                string `json:"Remarks"`
+	QueueTimeOutURL        string `json:"QueueTimeOutURL"`
+	ResultURL              string `json:"ResultURL"`
+}
+
+type GenericResponse struct {
+	OriginatorConversationID string `json:"OriginatorConversationID"`
+	ConversationID           string `json:"ConversationID"`
+	ResponseCode             string `json:"ResponseCode"`
+	ResponseDescription      string `json:"ResponseDescription"`
+}
+
+type GenericResult struct {
+	Result struct {
+		ResultType               string `json:"ResultType"`
+		ResultCode               string `json:"ResultCode"`
+		ResultDesc               string `json:"ResultDesc"`
+		OriginatorConversationID string `json:"OriginatorConversationID"`
+		ConversationID           string `json:"ConversationID"`
+		TransactionID            string `json:"TransactionID"`
+		ResultParameters         struct {
+			ResultParameter []struct {
+				Key   string `json:"Key"`
+				Value string `json:"Value"`
+			} `json:"ResultParameter"`
+		} `json:"ResultParameters"`
+		ReferenceData struct {
+			ReferenceItem []struct {
+				Key   string `json:"Key"`
+				Value string `json:"Value"`
+			} `json:"ReferenceItem"`
+		} `json:"ReferenceData"`
+	} `json:"Result"`
+}
+
+type BusinessToPaybillTransactionResponsePayload struct {
+	OriginatorConversationID string `json:"OriginatorConversationID"`
+	ConversationID           string `json:"ConversationID"`
+	ResponseCode             string `json:"ResponseCode"`
+	ResponseDescription      string `json:"ResponseDescription"`
+}
+
+type BillManagerOptInRequestPayload struct {
+	ShortCode       string `json:"shortcode"`
+	Email           string `json:"email"`
+	OfficialContact string `json:"officialContact"`
+	SendReminders   string `json:"sendReminders"`
+	Logo            []byte `json:"logo"`
+	CallbackURL     string `json:"callbackurl"`
+}
+
+type BillManagerOptInResponsePayload struct {
+	AppKey  string `json:"app_key"`
+	ResMsg  string `json:"resmsg"`
+	ResCode string `json:"rescode"`
+}
+
+type BillManagerSingleInvoiceRequestPayload struct {
+	ExternalReference string        `json:"externalReference"`
+	BilledFullName    string        `json:"billedFullName"`
+	BilledPhoneNumber string        `json:"billedPhoneNumber"`
+	BilledPeriod      string        `json:"billedPeriod"`
+	InvoiceName       string        `json:"invoiceName"`
+	DueDate           string        `json:"dueDate"`
+	AccountReference  string        `json:"accountReference"`
+	Amount            string        `json:"amount"`
+	InvoiceItems      []InvoiceItem `json:"invoiceItems"`
+}
+
+type InvoiceItem struct {
+	ItemName string `json:"itemName"`
+	Amount   string `json:"amount"`
+}
+
+type BillManagerResponsePayload struct {
+	StatusMessage string `json:"Status_Message"`
+	ResMsg        string `json:"resmsg"`
+	ResCode       string `json:"rescode"`
+}
+
+type BulkInvoicingGenericApiRequestPayload struct {
+	Invoices []BillManagerSingleInvoiceRequestPayload `json:"invoices"`
+}
+
+type BillManagerPaymentReconcilRequestPayload struct {
+	TransactionID    string `json:"transactionId"`
+	PaidAmount       string `json:"paidAmount"`
+	MSISDN           string `json:"msisdn"`
+	DateCreated      string `json:"dateCreated"`
+	AccountReference string `json:"accountReference"`
+	ShortCode        string `json:"shortCode"`
+}
+
+type BillManagerReceiptAcknowledgementPayload struct {
+	PaymentDate       string `json:"paymentDate"`
+	PaidAmount        string `json:"paidAmount"`
+	AccountReference  string `json:"accountReference"`
+	TransactionID     string `json:"transactionId"`
+	PhoneNumber       string `json:"phoneNumber"`
+	FullName          string `json:"fullName"`
+	InvoiceName       string `json:"invoiceName"`
+	ExternalReference string `json:"externalReference"`
+}
+type BillManagerPaymentAcknowledgmentResultPayload struct {
+	StatusCode       string `json:"statusCode"`
+	StatusMessage    string `json:"statusMessage"`
+	TransactionID    string `json:"transactionId"`
+	AccountReference string `json:"accountReference"`
+}
+
+type BillManagerPaymentsReconGenericResponse struct {
+	ResMsg  string `json:"resmsg"`
+	ResCode string `json:"rescode"`
+}
+
+type BillManagerCancelInvoiceRequestPayload struct {
+	ExternalReference string `json:"externalReference"`
+}
+
+type BillManagerCancelInvoiceResponsePayload struct {
+	StatusMessage string        `json:"Status_Message"`
+	ResMsg        string        `json:"resmsg"`
+	ResCode       string        `json:"rescode"`
+	Errors        []interface{} `json:"errors"`
+}
+
+type BillManagerUpdateOptInDetailsRequestPayload struct {
+	BillManagerOptInRequestPayload
+}
+
+type B2BEpressCheckoutRequestPayload struct {
+	PrimaryShortCode  string `json:"primaryShortCode"`
+	ReceiverShortCode string `json:"receiverShortCode"`
+	Amount            string `json:"amount"`
+	PaymentRef        string `json:"paymentRef"`
+	CallbackUrl       string `json:"callbackUrl"`
+	PartnerName       string `json:"partnerName"`
+	RequestRefID      string `json:"RequestRefID"`
+}
+
+type B2BExpressCheckoutResponsePayload struct {
+	Code   string `json:"code"`
+	Status string `json:"status"`
+}
+
+type USSDCallbackResponsePayload struct {
+	ResultCode       string `json:"resultCode"`
+	ResultDesc       string `json:"resultDesc"`
+	RequestID        string `json:"requestId"`
+	Amount           string `json:"amount"`
+	PaymentReference string `json:"paymentReference"`
+	ResultType       string `json:"resultType,omitempty"`
+	ConversationID   string `json:"conversationID,omitempty"`
+	TransactionID    string `json:"transactionId,omitempty"`
+	Status           string `json:"status,omitempty"`
+}
+
+
+type B2PochiPaymentRequestPayload struct {
+	OriginatorConversationID string `json:"OriginatorConversationID"`
+	InitiatorName           string `json:"InitiatorName"`
+	SecurityCredential      string `json:"SecurityCredential"`
+	CommandID               string `json:"CommandID"`
+	Amount                  string `json:"Amount"`
+	PartyA                  string `json:"PartyA"`
+	PartyB                  string `json:"PartyB"`
+	Remarks                 string `json:"Remarks"`
+	QueueTimeOutURL         string `json:"QueueTimeOutURL"`
+	ResultURL               string `json:"ResultURL"`
+	Occasion                string `json:"Occasion"`
+}
+
+type CallbackPayload struct {
+	Result struct {
+		ResultType               string `json:"ResultType"`
+		ResultCode               string `json:"ResultCode"`
+		ResultDesc               string `json:"ResultDesc"`
+		OriginatorConversationID string `json:"OriginatorConversationID"`
+		ConversationID           string `json:"ConversationID"`
+		TransactionID            string `json:"TransactionID"`
+		ResultParameters         struct {
+			ResultParameter []struct {
+				Key   string `json:"Key"`
+				Value string `json:"Value"`
+			} `json:"ResultParameter"`
+		} `json:"ResultParameters"`
+		ReferenceData struct {
+			ReferenceItem []struct {
+				Key   string `json:"Key"`
+				Value string `json:"Value"`
+			} `json:"ReferenceItem"`
+		} `json:"ReferenceData"`
+	} `json:"Result"`
+}
+
+
+type B2PochiErrorResponse struct {
+	RequestID    string `json:"requestId"`
+	ErrorCode    string `json:"errorCode"`
+	ErrorMessage string `json:"errorMessage"`
+}
+
+
+type B2CAccountTopUpRequestPayload struct {
+	Initiator              string `json:"Initiator"`
+	SecurityCredential     string `json:"SecurityCredential"`
+	CommandID              string `json:"CommandID"`
+	SenderIdentifierType   string `json:"SenderIdentifierType"`
+	RecieverIdentifierType string `json:"RecieverIdentifierType"`
+	Amount                 string `json:"Amount"`
+	PartyA                 string `json:"PartyA"`
+	PartyB                 string `json:"PartyB"`
+	AccountReference       string `json:"AccountReference"`
+	Requester              string `json:"Requester"`
+	Remarks                string `json:"Remarks"`
+	QueueTimeOutURL        string `json:"QueueTimeOutURL"`
+	ResultURL              string `json:"ResultURL"`
 }

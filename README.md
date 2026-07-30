@@ -26,6 +26,12 @@ daraja-go is a Go library for interacting with the Safaricom Daraja API. It cove
   - [Query Online Transaction Status](#query-online-transaction-status)
   - [Pull Transaction History](#pull-transaction-history)
   - [C2B Validation](#c2b-validation)
+  - [Tax Remittance (B2B)](#tax-remittance-b2b)
+  - [Business to Paybill / Buy Goods](#business-to-paybill--buy-goods)
+  - [B2B Express Checkout (USSD Push)](#b2b-express-checkout-ussd-push)
+  - [Business to Pochi](#business-to-pochi)
+  - [B2C Account Top Up](#b2c-account-top-up)
+  - [Bill Manager](#bill-manager)
 - [Error Handling](#error-handling)
 - [Types Reference](#types-reference)
 - [Constants](#constants)
@@ -360,6 +366,186 @@ desc := daraja.GetResultDesc(daraja.ResultCodeInvalidMSISDN)
 // desc == "Invalid MSISDN"
 ```
 
+### Tax Remittance (B2B)
+
+Remits tax on behalf of a customer directly to KRA.
+
+```go
+payload := &daraja.RemitKRARequestPayload{
+    Initiator:              "testapi",
+    SecurityCredential:     "encryptedcredential",
+    CommandID:              "PayTaxToKRA",
+    SenderIdentifierType:   "4",
+    ReceiverIdentifierType: "4",
+    Amount:                 "1000",
+    PartyA:                 "600996",
+    PartyB:                 "572572",
+    AccountReference:       "353353",
+    Remarks:                "Tax remittance",
+    QueueTimeOutURL:        "https://example.com/mpesa/timeout",
+    ResultURL:              "https://example.com/mpesa/result",
+}
+
+response, status, ok, errs := client.RemitTax(payload)
+if ok {
+    fmt.Println(response.ConversationID)
+}
+```
+
+### Business to Paybill / Buy Goods
+
+Sends money from one business shortcode to another paybill (`BusinessToPaybillTransaction`) or buy-goods till (`BusinessToBuyGoodsTransaction`) number.
+
+```go
+payload := &daraja.BusinessToPaybillTransactionRequestPayload{
+    Initiator:              "testapi",
+    SecurityCredential:     "encryptedcredential",
+    CommandID:              "BusinessPayBill",
+    SenderIdentifierType:   "4",
+    RecieverIdentifierType: "4",
+    Amount:                 "1000",
+    PartyA:                 "600996",
+    PartyB:                 "600000",
+    AccountReference:       "INV-2023-001",
+    Requester:              "254708374149",
+    Remarks:                "Payment for supplies",
+    QueueTimeOutURL:        "https://example.com/mpesa/timeout",
+    ResultURL:              "https://example.com/mpesa/result",
+}
+
+response, status, ok, errs := client.BusinessToPaybillTransaction(payload)
+if ok {
+    fmt.Println(response.ConversationID)
+}
+```
+
+`BusinessToBuyGoodsTransaction` takes a `*BusinessToBuyGoodsTransactionRequestPayload` with the same shape.
+
+### B2B Express Checkout (USSD Push)
+
+Prompts a customer to enter their M-Pesa PIN via USSD to complete a business payment.
+
+```go
+payload := &daraja.B2BEpressCheckoutRequestPayload{
+    PrimaryShortCode:  "600000",
+    ReceiverShortCode: "600996",
+    Amount:            "100",
+    PaymentRef:        "INV-001",
+    CallbackUrl:       "https://example.com/mpesa/callback",
+    PartnerName:       "Acme Ltd",
+    RequestRefID:      "req-001",
+}
+
+response, status, ok, errs := client.InitiateB2BExpressCheckout(payload)
+if ok {
+    fmt.Println(response.Status)
+}
+```
+
+### Business to Pochi
+
+Sends money from a business shortcode to a customer's Pochi la Biashara account.
+
+```go
+payload := &daraja.B2PochiPaymentRequestPayload{
+    OriginatorConversationID: "req-001",
+    InitiatorName:            "testapi",
+    SecurityCredential:       "encryptedcredential",
+    CommandID:                "BusinessPayment",
+    Amount:                   "500",
+    PartyA:                   "600996",
+    PartyB:                   "254708374149",
+    Remarks:                  "Payment",
+    QueueTimeOutURL:          "https://example.com/mpesa/timeout",
+    ResultURL:                "https://example.com/mpesa/result",
+    Occasion:                 "",
+}
+
+response, status, ok, errs := client.InitiateB2PochiPayment(payload)
+if ok {
+    fmt.Println(response.ConversationID)
+}
+```
+
+### B2C Account Top Up
+
+Tops up a customer's M-Pesa account balance from a business shortcode.
+
+```go
+payload := &daraja.B2CAccountTopUpRequestPayload{
+    Initiator:              "testapi",
+    SecurityCredential:     "encryptedcredential",
+    CommandID:              "BusinessPayToBulk",
+    SenderIdentifierType:   "4",
+    RecieverIdentifierType: "4",
+    Amount:                 "500",
+    PartyA:                 "600996",
+    PartyB:                 "600000",
+    AccountReference:       "TOPUP-001",
+    Requester:              "254708374149",
+    Remarks:                "Account top up",
+    QueueTimeOutURL:        "https://example.com/mpesa/timeout",
+    ResultURL:              "https://example.com/mpesa/result",
+}
+
+response, status, ok, errs := client.InitiateB2CAccountTopUp(payload)
+if ok {
+    fmt.Println(response.ConversationID)
+}
+```
+
+### Bill Manager
+
+A set of methods for the Bill Manager (invoicing) API:
+
+| Method | Description |
+| ------ | ----------- |
+| `BillManagerOptIn` | Opts a shortcode into Bill Manager, providing an email, contact number, and logo |
+| `BillManagerSendSingleInvoice` | Sends a single invoice to a customer |
+| `BillManagerSendBulkInvoice` | Sends multiple invoices at once |
+| `BillManagerReconcilePayment` | Reconciles a received payment against an invoice |
+| `BillManagerAcknowledgePayment` | Acknowledges a received payment against an invoice |
+| `BillManagerCancelSingleInvoice` | Cancels a single invoice by `ExternalReference` |
+| `BillManagerBulkCancelInvoices` | Cancels multiple invoices at once |
+| `BillManagerUpdateOptInDetails` | Updates the opted-in shortcode's Bill Manager details |
+
+```go
+optIn := &daraja.BillManagerOptInRequestPayload{
+    ShortCode:       "600996",
+    Email:           "billing@example.com",
+    OfficialContact: "254708374149",
+    SendReminders:   "1",
+    CallbackURL:     "https://example.com/mpesa/billmanager",
+}
+
+response, status, ok, errs := client.BillManagerOptIn(optIn)
+if ok {
+    fmt.Println(response.ResMsg)
+}
+
+invoice := &daraja.BillManagerSingleInvoiceRequestPayload{
+    ExternalReference: "INV-001",
+    BilledFullName:    "Jane Doe",
+    BilledPhoneNumber: "254708374149",
+    BilledPeriod:      "July 2026",
+    InvoiceName:       "Rent",
+    DueDate:           "2026-08-01",
+    AccountReference:  "RENT-001",
+    Amount:            "10000",
+    InvoiceItems: []daraja.InvoiceItem{
+        {ItemName: "Rent", Amount: "10000"},
+    },
+}
+
+response, status, ok, errs = client.BillManagerSendSingleInvoice(invoice)
+```
+
+`BillManagerAcknowledgePayment` additionally takes the acknowledgement callback URL as its second argument, since the API sends it dynamically:
+
+```go
+response, status, ok, errs := client.BillManagerAcknowledgePayment(payload, daraja.BillManagerReceiptAcknowledgement_URL)
+```
+
 ---
 
 ## Error Handling
@@ -455,6 +641,46 @@ The HTTP status code is returned regardless of whether the call succeeded. A sta
 | `RegisterPullTransactionsResponsePayload` | Response from pull transaction registration               |
 | `QueryPullTransactionsRequestPayload`     | Request payload to query transaction history              |
 | `QueryPullTransactionsResponsePayload`    | Response from pull transaction query                      |
+
+### Tax Remittance & Business Transfers
+
+| Type | Description |
+| ---- | ----------- |
+| `RemitKRARequestPayload` | Request payload for remitting tax to KRA |
+| `RemitKRAResponsePayload` | Response from a tax remittance request |
+| `RemitTaxResultPayload` / `RemitTaxFailedResultPayload` | Result callback payloads for tax remittance |
+| `BusinessToPaybillTransactionRequestPayload` | Request payload for a business-to-paybill transfer |
+| `BusinessToBuyGoodsTransactionRequestPayload` | Request payload for a business-to-buy-goods transfer |
+| `GenericResponse` | Shared response shape used by several business transfer APIs |
+| `GenericResult` / `CallbackPayload` | Shared result-callback shape used by several APIs |
+
+### B2B Express Checkout, Pochi & Top Up
+
+| Type | Description |
+| ---- | ----------- |
+| `B2BEpressCheckoutRequestPayload` | Request payload for USSD push (B2B express checkout) |
+| `B2BExpressCheckoutResponsePayload` | Response from a USSD push request |
+| `USSDCallbackResponsePayload` | Callback payload received after a USSD push completes |
+| `B2PochiPaymentRequestPayload` | Request payload for business-to-Pochi payment |
+| `B2PochiErrorResponse` | Error response from a Pochi payment request |
+| `B2CAccountTopUpRequestPayload` | Request payload for topping up a customer's M-Pesa account |
+
+### Bill Manager Types
+
+| Type | Description |
+| ---- | ----------- |
+| `BillManagerOptInRequestPayload` | Request payload to opt a shortcode into Bill Manager |
+| `BillManagerOptInResponsePayload` | Response from a Bill Manager opt-in request |
+| `BillManagerSingleInvoiceRequestPayload` | Request payload for a single invoice |
+| `InvoiceItem` | A single line item within an invoice |
+| `BulkInvoicingGenericApiRequestPayload` | Request payload for bulk invoicing |
+| `BillManagerResponsePayload` | Generic Bill Manager response |
+| `BillManagerPaymentReconcilRequestPayload` | Request payload to reconcile a payment |
+| `BillManagerReceiptAcknowledgementPayload` | Request payload to acknowledge a payment |
+| `BillManagerPaymentAcknowledgmentResultPayload` | Result callback for a payment acknowledgement |
+| `BillManagerCancelInvoiceRequestPayload` | Request payload to cancel one or more invoices |
+| `BillManagerCancelInvoiceResponsePayload` | Response from an invoice cancellation request |
+| `BillManagerUpdateOptInDetailsRequestPayload` | Request payload to update Bill Manager opt-in details |
 
 ---
 

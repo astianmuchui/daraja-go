@@ -199,7 +199,7 @@ func (d *Daraja) B2BPaymentRequest(r *B2BPaymentRequestPayload) (*B2BPaymentResp
     return &response, status, true, []error{}
 }
 
-func (d *Daraja) ReverseTransaction(r *ReversalRequestPayload) (*QueryTransactionStatusResponsePayload, int, bool, []error) {
+func (d *Daraja) ReverseTransaction(r *ReversalRequestPayload) (*ReversalResponsePayload, int, bool, []error) {
     if !d.IsAuthorized() {
         d.Authorize()
     }
@@ -207,13 +207,13 @@ func (d *Daraja) ReverseTransaction(r *ReversalRequestPayload) (*QueryTransactio
     payload, err := json.Marshal(r)
 
     if err != nil {
-        return &QueryTransactionStatusResponsePayload{}, 0, false, []error{err}
+        return &ReversalResponsePayload{}, 0, false, []error{err}
     }
 
-    status, response, errs := post(REVERSAL_URL, d.AccessToken, payload, QueryTransactionStatusResponsePayload{})
+    status, response, errs := post(REVERSAL_URL, d.AccessToken, payload, ReversalResponsePayload{})
 
     if len(errs) > 0 {
-        return &QueryTransactionStatusResponsePayload{}, status, false, errs
+        return &ReversalResponsePayload{}, status, false, errs
     }
 
     return &response, status, true, []error{}

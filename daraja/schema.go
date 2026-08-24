@@ -242,7 +242,6 @@ type ReversalRequestPayload struct {
 	ResultURL              string `json:"ResultURL"`
 	QueueTimeOutURL        string `json:"QueueTimeOutURL"`
 	Remarks                string `json:"Remarks"`
-	Occasion               string `json:"Occasion"`
 }
 
 type ReversalResponsePayload struct {

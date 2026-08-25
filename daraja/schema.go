@@ -314,6 +314,9 @@ type ValidateTransactionPayload struct {
 	LastName          string `json:"LastName,omitempty"`
 }
 
+// ValidationResponse is built by the caller and sent back to Daraja, so its
+// ResultCode stays a plain string — the tolerant types are for what Daraja
+// sends us, not what we send it.
 type ValidationResponse struct {
 	ResultCode string `json:"ResultCode"`
 	ResultDesc string `json:"ResultDesc"`
@@ -374,40 +377,31 @@ type RemitKRAResponsePayload struct {
 
 type RemitTaxResultPayload struct {
 	Result struct {
-		ResultType               string `json:"ResultType"`
-		ResultCode               string `json:"ResultCode"`
-		ResultDesc               string `json:"ResultDesc"`
-		OriginatorConversationID string `json:"OriginatorConversationID"`
-		ConversationID           string `json:"ConversationID"`
-		TransactionID            string `json:"TransactionID"`
+		ResultType               FlexString `json:"ResultType"`
+		ResultCode               FlexString `json:"ResultCode"`
+		ResultDesc               string     `json:"ResultDesc"`
+		OriginatorConversationID string     `json:"OriginatorConversationID"`
+		ConversationID           string     `json:"ConversationID"`
+		TransactionID            string     `json:"TransactionID"`
 		ResultParameters         struct {
-			ResultParameter []struct {
-				Key   string `json:"Key"`
-				Value string `json:"Value"`
-			} `json:"ResultParameter"`
+			ResultParameter ResultParameterList `json:"ResultParameter"`
 		} `json:"ResultParameters"`
 		ReferenceData struct {
-			ReferenceItem []struct {
-				Key   string `json:"Key"`
-				Value string `json:"Value"`
-			} `json:"ReferenceItem"`
+			ReferenceItem ReferenceItemList `json:"ReferenceItem"`
 		} `json:"ReferenceData"`
 	} `json:"Result"`
 }
 
 type RemitTaxFailedResultPayload struct {
 	Result struct {
-		ResultType               string `json:"ResultType"`
-		ResultCode               int    `json:"ResultCode"`
-		ResultDesc               string `json:"ResultDesc"`
-		OriginatorConversationID string `json:"OriginatorConversationID"`
-		ConversationID           string `json:"ConversationID"`
-		TransactionID            string `json:"TransactionID"`
+		ResultType               FlexString `json:"ResultType"`
+		ResultCode               FlexString `json:"ResultCode"`
+		ResultDesc               string     `json:"ResultDesc"`
+		OriginatorConversationID string     `json:"OriginatorConversationID"`
+		ConversationID           string     `json:"ConversationID"`
+		TransactionID            string     `json:"TransactionID"`
 		ResultParameters         struct {
-			ResultParameter []struct {
-				Key   string `json:"Key"`
-				Value string `json:"Value"`
-			} `json:"ResultParameter"`
+			ResultParameter ResultParameterList `json:"ResultParameter"`
 		} `json:"ResultParameters"`
 		ReferenceData struct {
 			ReferenceItem struct {
@@ -459,23 +453,17 @@ type GenericResponse struct {
 
 type GenericResult struct {
 	Result struct {
-		ResultType               string `json:"ResultType"`
-		ResultCode               string `json:"ResultCode"`
-		ResultDesc               string `json:"ResultDesc"`
-		OriginatorConversationID string `json:"OriginatorConversationID"`
-		ConversationID           string `json:"ConversationID"`
-		TransactionID            string `json:"TransactionID"`
+		ResultType               FlexString `json:"ResultType"`
+		ResultCode               FlexString `json:"ResultCode"`
+		ResultDesc               string     `json:"ResultDesc"`
+		OriginatorConversationID string     `json:"OriginatorConversationID"`
+		ConversationID           string     `json:"ConversationID"`
+		TransactionID            string     `json:"TransactionID"`
 		ResultParameters         struct {
-			ResultParameter []struct {
-				Key   string `json:"Key"`
-				Value string `json:"Value"`
-			} `json:"ResultParameter"`
+			ResultParameter ResultParameterList `json:"ResultParameter"`
 		} `json:"ResultParameters"`
 		ReferenceData struct {
-			ReferenceItem []struct {
-				Key   string `json:"Key"`
-				Value string `json:"Value"`
-			} `json:"ReferenceItem"`
+			ReferenceItem ReferenceItemList `json:"ReferenceItem"`
 		} `json:"ReferenceData"`
 	} `json:"Result"`
 }
@@ -602,51 +590,42 @@ type USSDCallbackResponsePayload struct {
 	Status           string `json:"status,omitempty"`
 }
 
-
 type B2PochiPaymentRequestPayload struct {
 	OriginatorConversationID string `json:"OriginatorConversationID"`
-	InitiatorName           string `json:"InitiatorName"`
-	SecurityCredential      string `json:"SecurityCredential"`
-	CommandID               string `json:"CommandID"`
-	Amount                  string `json:"Amount"`
-	PartyA                  string `json:"PartyA"`
-	PartyB                  string `json:"PartyB"`
-	Remarks                 string `json:"Remarks"`
-	QueueTimeOutURL         string `json:"QueueTimeOutURL"`
-	ResultURL               string `json:"ResultURL"`
-	Occasion                string `json:"Occasion"`
+	InitiatorName            string `json:"InitiatorName"`
+	SecurityCredential       string `json:"SecurityCredential"`
+	CommandID                string `json:"CommandID"`
+	Amount                   string `json:"Amount"`
+	PartyA                   string `json:"PartyA"`
+	PartyB                   string `json:"PartyB"`
+	Remarks                  string `json:"Remarks"`
+	QueueTimeOutURL          string `json:"QueueTimeOutURL"`
+	ResultURL                string `json:"ResultURL"`
+	Occasion                 string `json:"Occasion"`
 }
 
 type CallbackPayload struct {
 	Result struct {
-		ResultType               string `json:"ResultType"`
-		ResultCode               string `json:"ResultCode"`
-		ResultDesc               string `json:"ResultDesc"`
-		OriginatorConversationID string `json:"OriginatorConversationID"`
-		ConversationID           string `json:"ConversationID"`
-		TransactionID            string `json:"TransactionID"`
+		ResultType               FlexString `json:"ResultType"`
+		ResultCode               FlexString `json:"ResultCode"`
+		ResultDesc               string     `json:"ResultDesc"`
+		OriginatorConversationID string     `json:"OriginatorConversationID"`
+		ConversationID           string     `json:"ConversationID"`
+		TransactionID            string     `json:"TransactionID"`
 		ResultParameters         struct {
-			ResultParameter []struct {
-				Key   string `json:"Key"`
-				Value string `json:"Value"`
-			} `json:"ResultParameter"`
+			ResultParameter ResultParameterList `json:"ResultParameter"`
 		} `json:"ResultParameters"`
 		ReferenceData struct {
-			ReferenceItem []struct {
-				Key   string `json:"Key"`
-				Value string `json:"Value"`
-			} `json:"ReferenceItem"`
+			ReferenceItem ReferenceItemList `json:"ReferenceItem"`
 		} `json:"ReferenceData"`
 	} `json:"Result"`
 }
-
 
 type B2PochiErrorResponse struct {
 	RequestID    string `json:"requestId"`
 	ErrorCode    string `json:"errorCode"`
 	ErrorMessage string `json:"errorMessage"`
 }
-
 
 type B2CAccountTopUpRequestPayload struct {
 	Initiator              string `json:"Initiator"`

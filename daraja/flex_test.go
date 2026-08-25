@@ -5,12 +5,7 @@ import (
 	"testing"
 )
 
-/*
-The account balance result exactly as Safaricom sends it. Every mismatch this
-package had to grow a tolerant type for is present here at once: ResultType and
-ResultCode as bare numbers, a ResultParameter array mixing string and numeric
-Values, and a ReferenceItem that is a lone object rather than an array.
-*/
+
 const accountBalanceResult = `{"Result":{"ResultType":0,"ResultCode":0,"ResultDesc":"The service request is processed successfully.","OriginatorConversationID":"8d0a-4cf1-a3f3-ebad341607ad16074","ConversationID":"AG_20260825_010020480ucukatfpxp2","TransactionID":"UHP0000000","ResultParameters":{"ResultParameter":[{"Key":"ActionType","Value":"AccountBalance"},{"Key":"AccountBalance","Value":"Working Account|KES|0.00|0.00|0.00|0.00&Utility Account|KES|0.00|0.00|0.00|0.00&Charges Paid Account|KES|0.00|0.00|0.00|0.00&Merchant Account|KES|0.00|0.00|0.00|0.00&Organization Settlement Account|KES|0.00|0.00|0.00|0.00"},{"Key":"BOCompletedTime","Value":20260825140947}]},"ReferenceData":{"ReferenceItem":{"Key":"QueueTimeoutURL","Value":"https://internalapi.safaricom.co.ke/mpesa/abresults/v1/submit"}}}}`
 
 func TestCallbackPayloadDecodesAccountBalanceResult(t *testing.T) {

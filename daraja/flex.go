@@ -5,25 +5,6 @@ import (
 	"encoding/json"
 )
 
-/*
-Tolerant decoders for Daraja's result callbacks.
-
-Safaricom is not consistent about how it encodes these fields, and a mismatch
-is not a partial failure — encoding/json aborts the whole document, so one
-unexpected number discards an entire callback. The three types here absorb the
-variations that show up in practice:
-
-  ResultType / ResultCode   quoted on some callbacks, a bare number on others
-  ResultParameter[].Value   a string for AccountBalance, a number for
-                            BOCompletedTime, in the same array
-  ResultParameter           an array when there are several, sometimes a lone
-                            object when there is one
-  ReferenceItem             the same object-or-array inconsistency
-
-Use FlexString for any scalar Daraja might send unquoted.
-*/
-
-// FlexString holds a Daraja scalar that may arrive quoted or bare.
 type FlexString string
 
 func (f *FlexString) UnmarshalJSON(data []byte) error {
@@ -52,8 +33,8 @@ func (f *FlexString) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// MarshalJSON always emits a quoted string, so a decoded callback re-serialises
-// to a stable shape.
+
+
 func (f FlexString) MarshalJSON() ([]byte, error) {
 	return json.Marshal(string(f))
 }
@@ -62,14 +43,12 @@ func (f FlexString) String() string {
 	return string(f)
 }
 
-// ResultParameter is one Key/Value pair from a result callback.
+
 type ResultParameter struct {
 	Key   string     `json:"Key"`
 	Value FlexString `json:"Value"`
 }
 
-// ResultParameterList decodes ResultParameter whether Daraja sent an array or
-// a single object.
 type ResultParameterList []ResultParameter
 
 func (l *ResultParameterList) UnmarshalJSON(data []byte) error {
@@ -80,16 +59,11 @@ func (l *ResultParameterList) UnmarshalJSON(data []byte) error {
 	*l = items
 	return nil
 }
-
-// ReferenceItem is one Key/Value pair from a callback's ReferenceData.
 type ReferenceItem struct {
 	Key   string     `json:"Key"`
 	Value FlexString `json:"Value"`
 }
 
-// ReferenceItemList decodes ReferenceItem whether Daraja sent an array or a
-// single object. Account balance results send an object; reversal results send
-// an array.
 type ReferenceItemList []ReferenceItem
 
 func (l *ReferenceItemList) UnmarshalJSON(data []byte) error {
@@ -101,7 +75,6 @@ func (l *ReferenceItemList) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// decodeOneOrMany accepts either a JSON array of T or a single T object.
 func decodeOneOrMany[T any](data []byte) ([]T, error) {
 	data = bytes.TrimSpace(data)
 	if len(data) == 0 || bytes.Equal(data, []byte("null")) {
@@ -123,7 +96,7 @@ func decodeOneOrMany[T any](data []byte) ([]T, error) {
 	return []T{one}, nil
 }
 
-// Get returns the value of the first parameter with the given key.
+
 func (l ResultParameterList) Get(key string) string {
 	for _, p := range l {
 		if p.Key == key {
@@ -133,7 +106,7 @@ func (l ResultParameterList) Get(key string) string {
 	return ""
 }
 
-// Get returns the value of the first reference item with the given key.
+
 func (l ReferenceItemList) Get(key string) string {
 	for _, item := range l {
 		if item.Key == key {

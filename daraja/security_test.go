@@ -83,8 +83,6 @@ func TestGenerateSecurityCredential(t *testing.T) {
 	}
 }
 
-// PKCS #1 v1.5 padding is randomised, so the same password must not produce the
-// same credential twice - callers should generate one per request.
 func TestGenerateSecurityCredentialIsNotDeterministic(t *testing.T) {
 	_, der := testCert(t)
 

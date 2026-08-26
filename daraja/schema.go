@@ -315,7 +315,7 @@ type ValidateTransactionPayload struct {
 }
 
 // ValidationResponse is built by the caller and sent back to Daraja, so its
-// ResultCode stays a plain string — the tolerant types are for what Daraja
+// ResultCode stays a plain string - the tolerant types are for what Daraja
 // sends us, not what we send it.
 type ValidationResponse struct {
 	ResultCode string `json:"ResultCode"`

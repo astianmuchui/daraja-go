@@ -2,9 +2,11 @@ package daraja
 
 import (
 	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 )
-
 
 const accountBalanceResult = `{"Result":{"ResultType":0,"ResultCode":0,"ResultDesc":"The service request is processed successfully.","OriginatorConversationID":"8d0a-4cf1-a3f3-ebad341607ad16074","ConversationID":"AG_20260825_010020480ucukatfpxp2","TransactionID":"UHP0000000","ResultParameters":{"ResultParameter":[{"Key":"ActionType","Value":"AccountBalance"},{"Key":"AccountBalance","Value":"Working Account|KES|0.00|0.00|0.00|0.00&Utility Account|KES|0.00|0.00|0.00|0.00&Charges Paid Account|KES|0.00|0.00|0.00|0.00&Merchant Account|KES|0.00|0.00|0.00|0.00&Organization Settlement Account|KES|0.00|0.00|0.00|0.00"},{"Key":"BOCompletedTime","Value":20260825140947}]},"ReferenceData":{"ReferenceItem":{"Key":"QueueTimeoutURL","Value":"https://internalapi.safaricom.co.ke/mpesa/abresults/v1/submit"}}}}`
 
@@ -128,5 +130,55 @@ func TestFlexStringMarshalsAsString(t *testing.T) {
 	}
 	if again.Result.ResultCode != p.Result.ResultCode {
 		t.Errorf("ResultCode changed across a round trip: %q -> %q", p.Result.ResultCode, again.Result.ResultCode)
+	}
+}
+
+/*
+Daraja reports a rejected request with an HTTP status and an error body that
+unmarshals cleanly into any response type here, because none of them declare
+its fields. The result used to be a zero-valued response and no error at all,
+so a caller had a status and nothing to log.
+*/
+func TestPostSurfacesRejectionBodies(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+		_, _ = w.Write([]byte(`{"requestId":"1234-5678","errorCode":"404.001.04","errorMessage":"Invalid Initiator Information"}`))
+	}))
+	defer server.Close()
+
+	status, _, errs := post(server.URL, "token", []byte(`{}`), ReversalResponsePayload{})
+
+	if status != http.StatusNotFound {
+		t.Errorf("status = %d, want 404", status)
+	}
+	if len(errs) == 0 {
+		t.Fatal("a rejected request produced no error: the reason was discarded")
+	}
+
+	joined := errs[0].Error()
+	for _, want := range []string{"404", "Invalid Initiator Information"} {
+		if !strings.Contains(joined, want) {
+			t.Errorf("the error does not carry %q: %s", want, joined)
+		}
+	}
+}
+
+// A successful response must not be turned into an error.
+func TestPostAcceptsSuccess(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`{"OriginatorConversationID":"abc","ConversationID":"AG_1","ResponseCode":"0","ResponseDescription":"Accept the service request successfully."}`))
+	}))
+	defer server.Close()
+
+	status, out, errs := post(server.URL, "token", []byte(`{}`), ReversalResponsePayload{})
+
+	if status != http.StatusOK {
+		t.Errorf("status = %d, want 200", status)
+	}
+	if len(errs) != 0 {
+		t.Errorf("a successful response produced errors: %v", errs)
+	}
+	if out.OriginatorConversationID != "abc" {
+		t.Errorf("response did not decode: %+v", out)
 	}
 }

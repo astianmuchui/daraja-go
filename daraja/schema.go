@@ -159,7 +159,7 @@ type C2BConfirmationRequestPayload struct {
 type B2BPaymentRequestPayload struct {
 	Initiator              string `json:"Initiator"`
 	SecurityCredential     string `json:"SecurityCredential"`
-	CommandID              string `json:"Command ID"`
+	CommandID              string `json:"CommandID"`
 	SenderIdentifierType   string `json:"SenderIdentifierType"`
 	RecieverIdentifierType string `json:"RecieverIdentifierType"`
 	Amount                 string `json:"Amount"`
@@ -357,7 +357,7 @@ type QueryPullTransactionsResponsePayload struct {
 type RemitKRARequestPayload struct {
 	Initiator              string `json:"Initiator"`
 	SecurityCredential     string `json:"SecurityCredential"`
-	CommandID              string `json:"Command ID"`
+	CommandID              string `json:"CommandID"`
 	SenderIdentifierType   string `json:"SenderIdentifierType"`
 	ReceiverIdentifierType string `json:"RecieverIdentifierType"`
 	Amount                 string `json:"Amount"`
@@ -416,7 +416,7 @@ type RemitTaxFailedResultPayload struct {
 type BusinessToPaybillTransactionRequestPayload struct {
 	Initiator              string `json:"Initiator"`
 	SecurityCredential     string `json:"SecurityCredential"`
-	CommandID              string `json:"Command ID"`
+	CommandID              string `json:"CommandID"`
 	SenderIdentifierType   string `json:"SenderIdentifierType"`
 	RecieverIdentifierType string `json:"RecieverIdentifierType"`
 	Amount                 string `json:"Amount"`
@@ -432,7 +432,7 @@ type BusinessToPaybillTransactionRequestPayload struct {
 type BusinessToBuyGoodsTransactionRequestPayload struct {
 	Initiator              string `json:"Initiator"`
 	SecurityCredential     string `json:"SecurityCredential"`
-	CommandID              string `json:"Command ID"`
+	CommandID              string `json:"CommandID"`
 	SenderIdentifierType   string `json:"SenderIdentifierType"`
 	RecieverIdentifierType string `json:"RecieverIdentifierType"`
 	Amount                 string `json:"Amount"`

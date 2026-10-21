@@ -23,12 +23,6 @@ func (f *FlexString) UnmarshalJSON(data []byte) error {
 		return nil
 	}
 
-	/*
-		Numbers and booleans are kept as their literal source bytes rather than
-		routed through float64. BOCompletedTime is a 14-digit timestamp
-		(20260825140947); a float64 round-trip would render it in exponent
-		notation and lose the exact digits.
-	*/
 	*f = FlexString(data)
 	return nil
 }

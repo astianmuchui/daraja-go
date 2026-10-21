@@ -50,16 +50,6 @@ func post[T any](url string, token string, body []byte, out T) (int, T, []error)
 		errs = append(errs, err)
 	}
 
-	/*
-	   Daraja reports a rejected request with an HTTP status and a body like
-
-	       {"requestId":"...","errorCode":"...","errorMessage":"..."}
-
-	   which unmarshals cleanly into any of the response types here, because
-	   none of them declare those fields. The result was a zero-valued
-	   response, no error, and the reason discarded: a caller saw an empty
-	   struct and had nothing to log. Surface the body so the reason survives.
-	*/
 	if status < 200 || status > 299 {
 		errs = append(errs, fmt.Errorf("daraja: %s responded %d: %s", url, status, bodySnippet(res)))
 	}
@@ -67,7 +57,6 @@ func post[T any](url string, token string, body []byte, out T) (int, T, []error)
 	return status, payload, errs
 }
 
-// bodySnippet trims a response body to something loggable.
 func bodySnippet(body []byte) string {
 	text := strings.TrimSpace(string(body))
 	if text == "" {

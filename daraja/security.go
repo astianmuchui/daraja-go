@@ -10,8 +10,6 @@ import (
 	"os"
 )
 
-
-
 const (
 	IdentifierTypeMSISDN      = "1"
 	IdentifierTypeTill        = "2"
@@ -20,19 +18,6 @@ const (
 )
 
 var ErrNoRSAPublicKey = errors.New("daraja: certificate does not contain an RSA public key")
-
-
-
-
-
-//
-
-
-
-
-//
-
-
 
 func GenerateSecurityCredential(initiatorPassword string, cert []byte) (string, error) {
 	if initiatorPassword == "" {
@@ -52,8 +37,6 @@ func GenerateSecurityCredential(initiatorPassword string, cert []byte) (string, 
 	return base64.StdEncoding.EncodeToString(encrypted), nil
 }
 
-
-
 func GenerateSecurityCredentialFromFile(initiatorPassword string, certPath string) (string, error) {
 	cert, err := os.ReadFile(certPath)
 	if err != nil {
@@ -66,8 +49,6 @@ func GenerateSecurityCredentialFromFile(initiatorPassword string, certPath strin
 func parseRSAPublicKey(cert []byte) (*rsa.PublicKey, error) {
 	der := cert
 
-	
-	
 	if block, _ := pem.Decode(cert); block != nil {
 		der = block.Bytes
 

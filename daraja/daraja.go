@@ -25,7 +25,7 @@ func post[T any](url string, token string, body []byte, out T) (int, T, []error)
 		return 0, out, []error{err}
 	}
 
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token)) 
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{Timeout: 30 * time.Second}
@@ -594,6 +594,44 @@ func (d *Daraja) InitiateB2CAccountTopUp(r *B2CAccountTopUpRequestPayload) (*Gen
 
 	if len(errors) > 0 {
 		return &GenericResponse{}, status, false, errors
+	}
+
+	return &response, status, true, []error{}
+}
+
+func (d *Daraja) RegisterPullTransactions(r *RegisterPullTransactionsRequestPayload) (*RegisterPullTransactionsResponsePayload, int, bool, []error) {
+	if !d.IsAuthorized() {
+		d.Authorize()
+	}
+
+	payload, err := json.Marshal(r)
+	if err != nil {
+		return &RegisterPullTransactionsResponsePayload{}, 0, false, []error{err}
+	}
+
+	status, response, errs := post(TransactionHistoryRegister_URL, d.AccessToken, payload, RegisterPullTransactionsResponsePayload{})
+
+	if len(errs) > 0 {
+		return &RegisterPullTransactionsResponsePayload{}, status, false, errs
+	}
+
+	return &response, status, true, []error{}
+}
+
+func (d *Daraja) QueryPullTransactions(r *QueryPullTransactionsRequestPayload) (*QueryPullTransactionsResponsePayload, int, bool, []error) {
+	if !d.IsAuthorized() {
+		d.Authorize()
+	}
+
+	payload, err := json.Marshal(r)
+	if err != nil {
+		return &QueryPullTransactionsResponsePayload{}, 0, false, []error{err}
+	}
+
+	status, response, errs := post(TransactionHistoryQuery_URL, d.AccessToken, payload, QueryPullTransactionsResponsePayload{})
+
+	if len(errs) > 0 {
+		return &QueryPullTransactionsResponsePayload{}, status, false, errs
 	}
 
 	return &response, status, true, []error{}

@@ -6,6 +6,8 @@ By Sebastian Muchui :)
 package daraja
 
 import (
+	"bytes"
+	"encoding/json"
 	"time"
 )
 
@@ -344,14 +346,56 @@ type QueryPullTransactionsRequestPayload struct {
 	OffSetValue string `json:"OffSetValue"`
 }
 
+type PulledTransaction struct {
+	TransactionID    string     `json:"transactionId"`
+	TrxDate          string     `json:"trxDate"`
+	MSISDN           FlexString `json:"msisdn"`
+	Sender           string     `json:"sender"`
+	TransactionType  string     `json:"transactiontype"`
+	BillReference    string     `json:"billreference"`
+	Amount           FlexString `json:"amount"`
+	OrganizationName string     `json:"organizationname"`
+}
+
+type PulledTransactionList []PulledTransaction
+
+func (l *PulledTransactionList) UnmarshalJSON(data []byte) error {
+	data = bytes.TrimSpace(data)
+	if len(data) == 0 || bytes.Equal(data, []byte("null")) {
+		*l = nil
+		return nil
+	}
+
+	var nested [][]PulledTransaction
+	if err := json.Unmarshal(data, &nested); err == nil {
+		flat := PulledTransactionList{}
+		for _, page := range nested {
+			flat = append(flat, page...)
+		}
+		*l = flat
+		return nil
+	}
+
+	var flat []PulledTransaction
+	if err := json.Unmarshal(data, &flat); err != nil {
+		return err
+	}
+
+	*l = flat
+	return nil
+}
+
 type QueryPullTransactionsResponsePayload struct {
-	ResponseStatus      string `json:"ResponseStatus"`
-	ResponseDescription string `json:"ResponseDescription"`
-	ResponseRefID       string `json:"ResponseRefID"`
-	ShortCode           string `json:"ShortCode"`
-	StartDate           string `json:"StartDate"`
-	EndDate             string `json:"EndDate"`
-	OffSetValue         string `json:"OffSetValue"`
+	ResponseStatus      string                `json:"ResponseStatus"`
+	ResponseCode        FlexString            `json:"ResponseCode"`
+	ResponseMessage     string                `json:"ResponseMessage"`
+	ResponseDescription string                `json:"ResponseDescription"`
+	ResponseRefID       string                `json:"ResponseRefID"`
+	ShortCode           string                `json:"ShortCode"`
+	StartDate           string                `json:"StartDate"`
+	EndDate             string                `json:"EndDate"`
+	OffSetValue         string                `json:"OffSetValue"`
+	Response            PulledTransactionList `json:"Response"`
 }
 
 type RemitKRARequestPayload struct {
